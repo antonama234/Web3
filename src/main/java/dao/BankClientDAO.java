@@ -1,6 +1,5 @@
 package dao;
 
-import com.sun.deploy.util.SessionState;
 import model.BankClient;
 
 import java.sql.Connection;
@@ -11,11 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BankClientDAO {
-
+    private static BankClientDAO instance;
     private Connection connection;
 
-    public BankClientDAO(Connection connection) {
+    private BankClientDAO(Connection connection) {
         this.connection = connection;
+    }
+
+    public static BankClientDAO getInstance(Connection connection) {
+        if (instance == null) {
+            instance = new BankClientDAO(connection);
+        }
+        return instance;
     }
 
     public List<BankClient> getAllBankClient() throws SQLException {
@@ -37,12 +43,8 @@ public class BankClientDAO {
     }
 
     public boolean validateClient(String name, String password) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("select * from bank_client where name = '" + name + "'");
-        ResultSet result = statement.getResultSet();
-        statement.close();
-        result.close();
-        return result.getString("name").equals(name) && result.getString("password").equals(password);
+        BankClient client = getClientByName(name);
+        return client.getPassword().equals(password);
     }
 
     public void updateClientsMoney(String name, String password, Long transactValue) throws SQLException {
@@ -108,7 +110,7 @@ public class BankClientDAO {
 
     public void addClient(BankClient client) throws SQLException {
         Statement statement = connection.createStatement();
-        statement.execute("insert into bank_cliente (name, password, money) " +
+        statement.executeUpdate("insert into bank_cliente (name, password, money) " +
                 "values ('" + client.getName() + "', '" + client.getPassword() + "', '" + client.getMoney() + "')");
         statement.close();
     }

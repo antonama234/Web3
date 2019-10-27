@@ -27,6 +27,10 @@ public class Main {
         server.setHandler(context);
 
         server.start();
+        BankClientService bankClientService = BankClientService.getInstance();
+        bankClientService.createTable();
+        BankClient client = new BankClient("test", "cfece", 23L);
+        bankClientService.addClient(client);
         server.join();
     }
 }

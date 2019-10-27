@@ -15,7 +15,7 @@ public class ApiServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        BankClientService bankClientService = new BankClientService();
+        BankClientService bankClientService = BankClientService.getInstance();
         Gson gson = new Gson();
         String json = null;
         if (req.getPathInfo().contains("all")) {
@@ -42,7 +42,7 @@ public class ApiServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        BankClientService bankClientService = new BankClientService();
+        BankClientService bankClientService = BankClientService.getInstance();
         try {
             bankClientService.createTable();
             resp.setStatus(200);
@@ -53,7 +53,7 @@ public class ApiServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        BankClientService bankClientService = new BankClientService();
+        BankClientService bankClientService = BankClientService.getInstance();
         if (req.getPathInfo().contains("all")){
             try {
                 bankClientService.cleanUp();

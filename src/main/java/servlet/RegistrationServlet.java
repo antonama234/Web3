@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RegistrationServlet extends HttpServlet {
-    BankClientService bankClientService = new BankClientService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -26,14 +25,18 @@ public class RegistrationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        BankClientService bankClientService = BankClientService.getInstance();
         Map<String, Object> page = createPageVariablesMap(req);
-        BankClient client = new BankClient(
+        String name = req.getParameter("name");
+        String password = req.getParameter("password");
+        Long money = Long.parseLong(req.getParameter("money"));
+       /* BankClient client = new BankClient(
                 req.getParameter("name"),
                 req.getParameter("password"),
-                Long.parseLong(req.getParameter("money")));
+                Long.parseLong(req.getParameter("money")));*/
         try {
-            if (bankClientService.getClientByName(client.getName()) == null) {
-                bankClientService.addClient(client);
+            if (bankClientService.getClientByName(name) == null) {
+                bankClientService.addClient(new BankClient(name, password, money));
                 page.put("message", "Add client successful");
             }
         } catch (DBException e) {

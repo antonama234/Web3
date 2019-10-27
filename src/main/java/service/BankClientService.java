@@ -11,8 +11,22 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class BankClientService {
+    private static BankClientService instance;
+    private static Connection connection;
 
-    public BankClientService() {
+    private BankClientService() {
+    }
+
+    public static BankClientService getInstance() {
+        if (instance == null) {
+            instance = new BankClientService();
+            connection = getMysqlConnection();
+        }
+        return instance;
+    }
+
+    public static Connection getConnection() {
+        return connection;
     }
 
     public BankClient getClientById(long id) throws DBException {
@@ -111,12 +125,14 @@ public class BankClientService {
                     append("localhost:").           //host name
                     append("3306/").                //port
                     append("db_example?").          //db name
-                    append("user=root&").          //login
-                    append("password=root");       //password
+                    append("user=root&").            //login
+                    append("password=kopilka").     //password
+                    append("&serverTimezone=UTC");   //setup server time;
 
             System.out.println("URL: " + url + "\n");
 
             Connection connection = DriverManager.getConnection(url.toString());
+            connection.setAutoCommit(true);
             return connection;
         } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -125,6 +141,6 @@ public class BankClientService {
     }
 
     private static BankClientDAO getBankClientDAO() {
-        return new BankClientDAO(getMysqlConnection());
+        return BankClientDAO.getInstance(getMysqlConnection());
     }
 }

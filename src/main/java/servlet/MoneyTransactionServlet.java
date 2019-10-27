@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MoneyTransactionServlet extends HttpServlet {
-    BankClientService bankClientService = new BankClientService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -26,6 +25,7 @@ public class MoneyTransactionServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        BankClientService bankClientService = BankClientService.getInstance();
         Map<String, Object> page = createPageVariablesMap(req);
         String name = req.getParameter("senderName");
         String password = req.getParameter("senderPassword");
