@@ -25,11 +25,7 @@ public class ApiServlet extends HttpServlet {
                 e.printStackTrace();
             }
         } else {
-            try {
-                json = gson.toJson(bankClientService.getClientByName(req.getParameter("name")));
-            } catch (DBException e) {
-                e.printStackTrace();
-            }
+            json = gson.toJson(bankClientService.getClientByName(req.getParameter("name")));
         }
         resp.getWriter().write(json);
         resp.setStatus(200);

@@ -5,10 +5,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import service.BankClientService;
 import model.BankClient;
-import servlet.ApiServlet;
-import servlet.MoneyTransactionServlet;
-import servlet.RegistrationServlet;
-import servlet.ResultServlet;
+import servlet.*;
 
 public class Main {
     public static void main(String[] args) throws Exception{
@@ -27,10 +24,10 @@ public class Main {
         server.setHandler(context);
 
         server.start();
-        BankClientService bankClientService = BankClientService.getInstance();
+      /*  BankClientService bankClientService = BankClientService.getInstance();
         bankClientService.createTable();
-        BankClient client = new BankClient("test", "cfece", 23L);
-        bankClientService.addClient(client);
+        BankClient client = new BankClient("test", "cfececdc", 233L);
+        bankClientService.addClient(client);*/
         server.join();
     }
 }

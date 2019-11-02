@@ -2,10 +2,7 @@ package dao;
 
 import model.BankClient;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,12 +45,15 @@ public class BankClientDAO {
     }
 
     public void updateClientsMoney(String name, String password, Long transactValue) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("select * from bank_client where name = '" + name + "'");
+        PreparedStatement statement = connection.prepareStatement("select * from bank_client where name=?");
+        statement.setString(1, name);
         ResultSet result = statement.getResultSet();
         if (validateClient(name, password) && isClientHasSum(name, transactValue)) {
             Long rst = result.getLong("money") - transactValue;
-            statement.execute("update bank_client set money = '" + rst + "' where name = '" + name + "' and password = '" + password + "'");
+            statement = connection.prepareStatement("update bank_client set money = ? where name LIKE ? and password = ?");
+            statement.setLong(1, rst);
+            statement.setString(2, name);
+            statement.setString(3, password);
         }
         result.close();
         statement.close();
@@ -110,7 +110,7 @@ public class BankClientDAO {
 
     public void addClient(BankClient client) throws SQLException {
         Statement statement = connection.createStatement();
-        statement.executeUpdate("insert into bank_cliente (name, password, money) " +
+        statement.executeUpdate("insert into bank_client (name, password, money) " +
                 "values ('" + client.getName() + "', '" + client.getPassword() + "', '" + client.getMoney() + "')");
         statement.close();
     }

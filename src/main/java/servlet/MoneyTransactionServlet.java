@@ -1,5 +1,6 @@
 package servlet;
 
+import dao.BankClientDAO;
 import exception.DBException;
 import model.BankClient;
 import service.BankClientService;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,14 +31,14 @@ public class MoneyTransactionServlet extends HttpServlet {
         Map<String, Object> page = createPageVariablesMap(req);
         String name = req.getParameter("senderName");
         String password = req.getParameter("senderPassword");
-        Long money = Long.valueOf(req.getParameter("money"));
+        Long money = Long.valueOf(req.getParameter("count"));
         String nameTo = req.getParameter("nameTo");
         try {
             BankClient clientFrom = bankClientService.getClientByName(name);
-            if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money)){
+            if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money) && bankClientService.validate(name, password)){
                 page.put("message", "The transaction was successful");
             }
-        } catch (DBException e) {
+        } catch (DBException | SQLException e) {
             page.put("message", "transaction rejected");
         }
         resp.getWriter().println(PageGenerator.getInstance().getPage("resultPage.html", page));

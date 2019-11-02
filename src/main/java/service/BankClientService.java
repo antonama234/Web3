@@ -37,12 +37,13 @@ public class BankClientService {
         }
     }
 
-    public BankClient getClientByName(String name) throws DBException {
+    public BankClient getClientByName(String name) {
         try {
             return getBankClientDAO().getClientByName(name);
         } catch (SQLException e) {
-            throw new DBException(e);
+            e.getStackTrace();
         }
+        return null;
     }
 
     public List<BankClient> getAllClient() throws DBException {
@@ -67,17 +68,22 @@ public class BankClientService {
         return success;
     }
 
-    public boolean addClient(BankClient client) throws DBException {
-        boolean success = false;
+    public boolean existClient(String name) throws DBException {
+        return getClientByName(name) != null;
+    }
+
+    public boolean validate(String name, String password) throws SQLException {
+        return getBankClientDAO().validateClient(name, password);
+    }
+
+    public void addClient(BankClient client) throws DBException {
         try {
-            if (client != null) {
+            if (!existClient(client.getName())) {
                 getBankClientDAO().addClient(client);
-                success  = true;
             }
         } catch (SQLException e) {
-            throw new DBException(e);
+            e.printStackTrace();
         }
-        return success;
     }
 
     public boolean sendMoneyToClient(BankClient sender, String name, Long value) throws DBException {

@@ -18,7 +18,7 @@ public class RegistrationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> page = createPageVariablesMap(req);
-        resp.getWriter().println(new PageGenerator().getPage("registrationPage.html", page));
+        resp.getWriter().println(PageGenerator.getInstance().getPage("registrationPage.html", page));
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
     }
@@ -26,18 +26,22 @@ public class RegistrationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         BankClientService bankClientService = BankClientService.getInstance();
-        Map<String, Object> page = createPageVariablesMap(req);
-        String name = req.getParameter("name");
+        Map<String, Object> page = new HashMap<>();
+
+   /*             String name = req.getParameter("name");
         String password = req.getParameter("password");
-        Long money = Long.parseLong(req.getParameter("money"));
-       /* BankClient client = new BankClient(
+        Long money = Long.parseLong(req.getParameter("money"));*/
+
+        BankClient client = new BankClient(
                 req.getParameter("name"),
                 req.getParameter("password"),
-                Long.parseLong(req.getParameter("money")));*/
+                Long.parseLong(req.getParameter("money")));
         try {
-            if (bankClientService.getClientByName(name) == null) {
-                bankClientService.addClient(new BankClient(name, password, money));
+            if (!bankClientService.existClient(client.getName())) {
+                bankClientService.addClient(client);
                 page.put("message", "Add client successful");
+            } else {
+                page.put("message", "Client not add");
             }
         } catch (DBException e) {
             page.put("message", "Client not add");
