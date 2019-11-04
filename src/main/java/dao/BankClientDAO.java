@@ -47,13 +47,15 @@ public class BankClientDAO {
     public void updateClientsMoney(String name, String password, Long transactValue) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("select * from bank_client where name=?");
         statement.setString(1, name);
-        ResultSet result = statement.getResultSet();
-        if (validateClient(name, password) && isClientHasSum(name, transactValue)) {
-            Long rst = result.getLong("money") - transactValue;
+        ResultSet result = statement.executeQuery();
+        result.next();
+        if (validateClient(name, password)) {
+            Long rst = result.getLong("money") + transactValue;
             statement = connection.prepareStatement("update bank_client set money = ? where name LIKE ? and password = ?");
             statement.setLong(1, rst);
             statement.setString(2, name);
             statement.setString(3, password);
+            statement.executeUpdate();
         }
         result.close();
         statement.close();
@@ -73,24 +75,15 @@ public class BankClientDAO {
         return client;
     }
 
-    public boolean isClientHasSum(String name, Long expectedSum) throws SQLException {
+        public boolean isClientHasSum(String name, Long expectedSum) throws SQLException {
         Statement statement = connection.createStatement();
         statement.execute("select * from bank_client where name = '" + name + "'");
         ResultSet result = statement.getResultSet();
-        statement.close();
-        result.close();
-        return result.getLong("money") >= expectedSum;
-    }
-
-    public long getClientIdByName(String name) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.execute("select * from bank_clien where name='" + name + "'");
-        ResultSet result = stmt.getResultSet();
         result.next();
-        Long id = result.getLong(1);
+        Long money = result.getLong("money");
         result.close();
-        stmt.close();
-        return id;
+        statement.close();
+        return money >= expectedSum;
     }
 
     public BankClient getClientByName(String name) throws SQLException {
@@ -106,6 +99,17 @@ public class BankClientDAO {
         result.close();
         statement.close();
         return client;
+    }
+
+    public long getClientIdByName(String name) throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.execute("select * from bank_clien where name='" + name + "'");
+        ResultSet result = stmt.getResultSet();
+        result.next();
+        Long id = result.getLong(1);
+        result.close();
+        stmt.close();
+        return id;
     }
 
     public void addClient(BankClient client) throws SQLException {

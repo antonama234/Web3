@@ -24,10 +24,13 @@ public class Main {
         server.setHandler(context);
 
         server.start();
-      /*  BankClientService bankClientService = BankClientService.getInstance();
+    /*    BankClientService bankClientService = BankClientService.getInstance();
         bankClientService.createTable();
         BankClient client = new BankClient("test", "cfececdc", 233L);
-        bankClientService.addClient(client);*/
+        BankClient client2 = new BankClient("test3", "cfdc", 23L);
+        bankClientService.addClient(client);
+        bankClientService.addClient(client2);
+        bankClientService.sendMoneyToClient(client, "test3", 100L);*/
         server.join();
     }
 }

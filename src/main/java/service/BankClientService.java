@@ -92,8 +92,8 @@ public class BankClientService {
         try {
             if (dao.isClientHasSum(sender.getName(), value)) {
                 BankClient recipient = dao.getClientByName(name);
-                recipient.setMoney(recipient.getMoney() + value);
-                dao.updateClientsMoney(sender.getName(), sender.getPassword(), value);
+                dao.updateClientsMoney(sender.getName(), sender.getPassword(), -value);
+                dao.updateClientsMoney(recipient.getName(), recipient.getPassword(), value);
                 success = true;
             }
         } catch (SQLException e) {
@@ -132,7 +132,7 @@ public class BankClientService {
                     append("3306/").                //port
                     append("db_example?").          //db name
                     append("user=root&").            //login
-                    append("password=kopilka").     //password
+                    append("password=root").     //password
                     append("&serverTimezone=UTC");   //setup server time;
 
             System.out.println("URL: " + url + "\n");

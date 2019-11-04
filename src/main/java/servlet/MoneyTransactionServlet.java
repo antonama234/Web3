@@ -20,7 +20,7 @@ public class MoneyTransactionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> page = createPageVariablesMap(req);
-        resp.getWriter().println(new PageGenerator().getPage("registrationPage.html", page));
+        resp.getWriter().println(new PageGenerator().getPage("moneyTransactionPage.html", page));
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
     }
@@ -35,10 +35,12 @@ public class MoneyTransactionServlet extends HttpServlet {
         String nameTo = req.getParameter("nameTo");
         try {
             BankClient clientFrom = bankClientService.getClientByName(name);
-            if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money) && bankClientService.validate(name, password)){
+            if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money)){
                 page.put("message", "The transaction was successful");
+            } else {
+                page.put("message", "transaction rejected");
             }
-        } catch (DBException | SQLException e) {
+        } catch (DBException e) {
             page.put("message", "transaction rejected");
         }
         resp.getWriter().println(PageGenerator.getInstance().getPage("resultPage.html", page));
