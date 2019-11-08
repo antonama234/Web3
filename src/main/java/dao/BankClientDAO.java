@@ -49,22 +49,21 @@ public class BankClientDAO {
         statement.setString(1, name);
         ResultSet result = statement.executeQuery();
         result.next();
-        if (validateClient(name, password)) {
-            Long rst = result.getLong("money") + transactValue;
-            statement = connection.prepareStatement("update bank_client set money = ? where name LIKE ? and password = ?");
-            statement.setLong(1, rst);
-            statement.setString(2, name);
-            statement.setString(3, password);
-            statement.executeUpdate();
-        }
+        Long rst = result.getLong("money") + transactValue;
+        statement = connection.prepareStatement("update bank_client set money = ? where name LIKE ? and password = ?");
+        statement.setLong(1, rst);
+        statement.setString(2, name);
+        statement.setString(3, password);
+        statement.executeUpdate();
         result.close();
         statement.close();
     }
 
     public BankClient getClientById(long id) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("select * from bank_client where id = '" + id + "'");
-        ResultSet result = statement.getResultSet();
+        PreparedStatement statement = connection.prepareStatement("select * from bank_client where id=?");
+        statement.setString(1, String.valueOf(id));
+        ResultSet result = statement.executeQuery();
+        result.next();
         BankClient client = new BankClient(
                 result.getLong("id"),
                 result.getString("name"),
@@ -76,9 +75,9 @@ public class BankClientDAO {
     }
 
         public boolean isClientHasSum(String name, Long expectedSum) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("select * from bank_client where name = '" + name + "'");
-        ResultSet result = statement.getResultSet();
+        PreparedStatement statement = connection.prepareStatement("select * from bank_client where name = ?");
+        statement.setString(1, name);
+        ResultSet result = statement.executeQuery();
         result.next();
         Long money = result.getLong("money");
         result.close();
@@ -87,9 +86,9 @@ public class BankClientDAO {
     }
 
     public BankClient getClientByName(String name) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.execute("select * from bank_client where name = '" + name + "'");
-        ResultSet result = statement.getResultSet();
+        PreparedStatement statement = connection.prepareStatement("select * from bank_client where name = ?");
+        statement.setString(1, name);
+        ResultSet result = statement.executeQuery();
         result.next();
         BankClient client = new BankClient(
                 result.getLong("id"),
@@ -102,20 +101,22 @@ public class BankClientDAO {
     }
 
     public long getClientIdByName(String name) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.execute("select * from bank_clien where name='" + name + "'");
-        ResultSet result = stmt.getResultSet();
+        PreparedStatement statement = connection.prepareStatement("select * from bank_client where name = ?");
+        statement.setString(1, name);
+        ResultSet result = statement.getResultSet();
         result.next();
         Long id = result.getLong(1);
         result.close();
-        stmt.close();
+        statement.close();
         return id;
     }
 
     public void addClient(BankClient client) throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.executeUpdate("insert into bank_client (name, password, money) " +
-                "values ('" + client.getName() + "', '" + client.getPassword() + "', '" + client.getMoney() + "')");
+        PreparedStatement statement = connection.prepareStatement("insert into bank_client (name, password, money) values (?, ?, ?)");
+        statement.setString(1 , client.getName());
+        statement.setString(2 , client.getPassword());
+        statement.setLong(3 , client.getMoney());
+        statement.executeUpdate();
         statement.close();
     }
 

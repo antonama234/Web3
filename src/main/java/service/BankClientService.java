@@ -72,10 +72,6 @@ public class BankClientService {
         return getClientByName(name) != null;
     }
 
-    public boolean validate(String name, String password) throws SQLException {
-        return getBankClientDAO().validateClient(name, password);
-    }
-
     public void addClient(BankClient client) throws DBException {
         try {
             if (!existClient(client.getName())) {
@@ -90,10 +86,10 @@ public class BankClientService {
         BankClientDAO dao = getBankClientDAO();
         boolean success = false;
         try {
-            if (dao.isClientHasSum(sender.getName(), value)) {
+            if (dao.isClientHasSum(sender.getName(), value) && dao.validateClient(sender.getName(), sender.getPassword())) {
                 BankClient recipient = dao.getClientByName(name);
                 dao.updateClientsMoney(sender.getName(), sender.getPassword(), -value);
-                dao.updateClientsMoney(recipient.getName(), recipient.getPassword(), value);
+                dao.updateClientsMoney(name, recipient.getPassword(), value);
                 success = true;
             }
         } catch (SQLException e) {
@@ -132,7 +128,7 @@ public class BankClientService {
                     append("3306/").                //port
                     append("db_example?").          //db name
                     append("user=root&").            //login
-                    append("password=root").     //password
+                    append("password=kopilka").     //password
                     append("&serverTimezone=UTC");   //setup server time;
 
             System.out.println("URL: " + url + "\n");

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MoneyTransactionServlet extends HttpServlet {
-
+    BankClientService bankClientService = BankClientService.getInstance();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> page = createPageVariablesMap(req);
@@ -27,22 +27,26 @@ public class MoneyTransactionServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        BankClientService bankClientService = BankClientService.getInstance();
         Map<String, Object> page = createPageVariablesMap(req);
         String name = req.getParameter("senderName");
-        String password = req.getParameter("senderPassword");
+        String password = req.getParameter("senderPass");
         Long money = Long.valueOf(req.getParameter("count"));
         String nameTo = req.getParameter("nameTo");
         try {
             BankClient clientFrom = bankClientService.getClientByName(name);
-            if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money)){
-                page.put("message", "The transaction was successful");
+            if (clientFrom.getPassword().equals(password)) {
+                if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money)) {
+                    page.put("message", "The transaction was successful");
+                } else {
+                    page.put("message", "transaction rejected");
+                }
             } else {
                 page.put("message", "transaction rejected");
             }
         } catch (DBException e) {
             page.put("message", "transaction rejected");
         }
+
         resp.getWriter().println(PageGenerator.getInstance().getPage("resultPage.html", page));
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
